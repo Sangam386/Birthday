@@ -35,19 +35,20 @@ function reloadPuzzle() {
   allDoneElement.classList.toggle("allDone");
 }
 
-// mobile functionality
+// Mobile functionality
 var puzzleItemsMobile = document.querySelectorAll("#puzz i");
 puzzleItemsMobile.forEach(function (element) {
-  element.addEventListener("touchstart", function () {
+  element.addEventListener("touchstart", function (event) {
+    event.preventDefault();
     totalClicks++;
     document.querySelector("#clicks").innerHTML = totalClicks;
+    element.classList.add("clicked");
   });
-  element.addEventListener("touchend", function () {
+
+  element.addEventListener("touchend", function (event) {
+    event.preventDefault();
     if (document.querySelector(".clicked")) {
-      document.querySelector(".clicked").classList.toggle("clicked");
-      element.classList.toggle("clicked");
-    } else {
-      element.classList.toggle("clicked");
+      document.querySelector(".clicked").classList.remove("clicked");
     }
   });
 });
@@ -60,9 +61,9 @@ puzzleItemsDesktop.forEach(function (element) {
       if (clickedElement.classList.contains(element.classList)) {
         element.classList.add("dropped");
         clickedElement.classList.add("done");
-        clickedElement.classList.toggle("clicked");
+        clickedElement.classList.remove("clicked");
 
-        if (document.querySelectorAll(".dropped").length == 9) {
+        if (document.querySelectorAll(".dropped").length === 9) {
           document.querySelector("#puz").classList.add("allDone");
           document.querySelector("#puz").style.border = "none";
           document.querySelector("#puz").style.animation =
@@ -78,7 +79,7 @@ puzzleItemsDesktop.forEach(function (element) {
   });
 });
 
-// mobile drag and drop
+// Mobile drag and drop
 function allowDrop(ev) {
   ev.preventDefault();
 }
@@ -91,13 +92,13 @@ function drop(ev) {
   ev.preventDefault();
   var data = ev.dataTransfer.getData("text");
 
-  if (ev.target.className == data) {
+  if (ev.target.className === data) {
     ev.target.classList.add("dropped");
     document
       .querySelector("." + data + "[draggable='true']")
       .classList.add("done");
 
-    if (document.querySelectorAll(".dropped").length == 9) {
+    if (document.querySelectorAll(".dropped").length === 9) {
       document.querySelector("#puz").classList.add("allDone");
       document.querySelector("#puz").style.border = "none";
       document.querySelector("#puz").style.animation =
@@ -109,4 +110,5 @@ function drop(ev) {
       }, 1500);
     }
   }
-}
+    }
+              
