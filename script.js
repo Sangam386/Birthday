@@ -52,4 +52,61 @@ puzzleItemsMobile.forEach(function (element) {
   });
 });
 
-// Remove desktop drag and drop functionality
+var puzzleItemsDesktop = document.querySelectorAll("#puz i");
+puzzleItemsDesktop.forEach(function (element) {
+  element.addEventListener("click", function () {
+    if (document.querySelector(".clicked")) {
+      var clickedElement = document.querySelector(".clicked");
+      if (clickedElement.classList.contains(element.classList)) {
+        element.classList.add("dropped");
+        clickedElement.classList.add("done");
+        clickedElement.classList.toggle("clicked");
+
+        if (document.querySelectorAll(".dropped").length == 9) {
+          document.querySelector("#puz").classList.add("allDone");
+          document.querySelector("#puz").style.border = "none";
+          document.querySelector("#puz").style.animation =
+            "allDone 1s linear forwards";
+
+          setTimeout(function () {
+            reloadPuzzle();
+            randomizeImage();
+          }, 1500);
+        }
+      }
+    }
+  });
+});
+
+// mobile drag and drop
+function allowDrop(ev) {
+  ev.preventDefault();
+}
+
+function drag(ev) {
+  ev.dataTransfer.setData("text", ev.target.className);
+}
+
+function drop(ev) {
+  ev.preventDefault();
+  var data = ev.dataTransfer.getData("text");
+
+  if (ev.target.className == data) {
+    ev.target.classList.add("dropped");
+    document
+      .querySelector("." + data + "[draggable='true']")
+      .classList.add("done");
+
+    if (document.querySelectorAll(".dropped").length == 9) {
+      document.querySelector("#puz").classList.add("allDone");
+      document.querySelector("#puz").style.border = "none";
+      document.querySelector("#puz").style.animation =
+        "allDone 1s linear forwards";
+
+      setTimeout(function () {
+        reloadPuzzle();
+        randomizeImage();
+      }, 1500);
+    }
+  }
+}
