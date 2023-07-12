@@ -1,4 +1,4 @@
-var images = ['https://images.srkh.in/wp-content/uploads/2023/02/Happy-Propose-Day-Images-333-I-LOVE-YOU.jpg'];
+var images = ['https://iili.io/H6EOvBS.jpg'];
 
 var currentIndex = 0;
 var totalClicks = 0;
