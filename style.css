@@ -1,116 +1,125 @@
-:root {
-  --color:lightgray;
-  --border-radius:10px;
-}
+@import url(https://fonts.googleapis.com/css?family=Raleway:400,500,300,600,700,800);
 
 body {
-  background:#efefef;
-  padding:0;
-  margin:0;
-  box-sizing:border-box;
+    background-image: radial-gradient(#374566, #010203);
+    color: #ccc;
+    font-family: Raleway;
+    letter-spacing: 0.15em;
+    font-size: 20px;
 }
 
-#puz, #puzz {
-  position:absolute;
-  border-radius:var(--border-radius) 0 var(--border-radius) 0;    
-  user-select:none;
-}
-#puz {
-  width:300px;
-  height:300px;
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  border:3px dashed lightgray;
-  overflow:hidden;
-}
-#puzz {
-  left:0;
-  top:0;
-  border:0;
+canvas {
+    position: absolute;
+    z-index: -1;
+    top: 0;
 }
 
-#puz i {
-  float:left;
-  width:100px;
-  height:100px;
-  outline:1px dashed lightgray;
+#wishes {
+    width: 100%;
+    margin: 20vh auto;
+    border: 1px dotted;
+    text-align: center;
+    background: hsla(210, 50%, 15%, 0.75);
+    padding: 1em;
 }
 
-#puzz i {
-  position:absolute;
-  width:100px;
-  height:100px;
-  background:var(--color);
-  background-image:var(--image);
-  background-size:300px 300px;
-  cursor:move;
-  box-shadow:0 0 10px rgba(0,0,0,.25);
+span {
+    display: inline-block;
 }
 
-.first {
-  border-top-left-radius:var(--border-radius);
-  background-position:left top !important;
-}
-.secon {
-  background-position:center top !important;
-}
-.third {
-/*   border-top-right-radius:var(--border-radius); */
-  background-position:right top !important;
-}
-.fourt {
-  background-position:left center !important;
-}
-.fifth {
-  background-position:center center !important;
-}
-.sixth {  
-  background-position:right center !important;
-}
-.seven {
-/*   border-bottom-left-radius:var(--border-radius); */
-  background-position:left bottom !important;
-}
-.eight {
-  background-position:center bottom !important;
-}
-.ninth {
-  border-bottom-right-radius:var(--border-radius);
-  background-position:right bottom !important;
+span.jump {
+    animation: jump 0.25s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0s 2 alternate;
 }
 
-.clicked {
-  box-shadow:0 0 0 4px gray !important;
+@keyframes jump {
+    to {
+        transform: translateY(-0.7em);
+    }
 }
 
-.dropped {
-  background:var(--color);
-  background-image:var(--image);
-  background-size:300px 300px;
-}
-.done {
-  opacity:0;
-  pointer-events:none;
-}
-
-.allDone {
-  animation:allDone 1s linear forwards;
-  border:3px solid lightgray !important;
-}
-.allDone i {
-  outline:0 !important;
+#pleaseClick {
+    position: absolute;
+    margin: -100px 160px;
+    background: hsla(210, 50%, 15%, 0.75);
+    font-size: 80%;
+    text-align: center;
+    animation: jump 1s ease-in-out infinite alternate;
+    padding: 1em;
 }
 
-@keyframes allDone {
-  50% { transform:translate(-50%,-50%) scale(1.2); }
+#pleaseClick span {
+    font-size: 200%;
 }
 
-#clicks {
-  font-size:8px;
-  font-family:monospace;
-  position:absolute;
-  bottom:5px;
-  right:5px;
+.control {
+    text-align: center;
+}
+
+input[type="range"],
+input[type="range"]::-webkit-slider-runnable-track,
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 100%;
+}
+
+input[type="range"]::-webkit-slider-thumb,
+input[type="range"]::-moz-range-thumb,
+input[type="range"]::-ms-thumb {
+    background-color: #777;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #374566;
+    border-radius: 50%;
+    margin-top: -9px;
+}
+
+input[type="range"]::-moz-range-thumb {
+    background-color: #777;
+    width: 15px;
+    height: 15px;
+    border: 3px solid #333;
+    border-radius: 50%;
+}
+
+input[type="range"]::-ms-thumb {
+    background-color: #777;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #333;
+    border-radius: 50%;
+}
+
+input[type="range"]::-webkit-slider-runnable-track,
+input[type="range"]::-moz-range-track,
+input[type="range"]::-ms-track {
+    background-color: #777;
+    height: 3px;
+}
+
+input[type="range"]:focus::-webkit-slider-runnable-track {
+    outline: none;
+}
+
+input[type="range"]::-moz-range-track,
+input[type="range"]::-ms-track {
+    background-color: #777;
+    height: 3px;
+}
+
+input[type="range"]::-ms-fill-lower {
+    background-color: HotPink;
+}
+
+input[type="range"]::-ms-fill-upper {
+    background-color: black;
+}
+
+@media (max-width: 768px) {
+    body {
+        font-size: 16px;
+    }
+
+    #wishes {
+        width: 90%;
+    }
 }
