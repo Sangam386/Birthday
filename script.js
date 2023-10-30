@@ -1,106 +1,207 @@
-var images = ['https://iili.io/H6EOvBS.jpg'];
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-var currentIndex = 0;
-var totalClicks = 0;
+const notes = [
+  {f:262,d:.5,t:"Hap",p:p1},
+  {f:262,d:.5,t:"py&nbsp;",p:p1},
+  {f:294,d:1,t:"Birth",p:p1},
+  {f:262,d:1,t:"day&nbsp;",p:p1},
+  {f:349,d:1,t:"To&nbsp;",p:p1},
+  {f:330,d:2,t:"You",p:p1},
+  
+  {f:262,d:.5,t:"Hap",p:p2},
+  {f:262,d:.5,t:"py&nbsp;",p:p2},
+  {f:294,d:1,t:"Birth",p:p2},
+  {f:262,d:1,t:"day&nbsp;",p:p2},
+  {f:392,d:1,t:"To&nbsp;",p:p2},
+  {f:349,d:2,t:"You",p:p2},
+  
+  {f:262,d:.5,t:"Hap",p:p3},
+  {f:262,d:.5,t:"py&nbsp;",p:p3},
+  {f:523,d:1,t:"Birth",p:p3},
+  {f:440,d:1,t:"day&nbsp;",p:p3},
+  {f:349,d:1,t:"Dear&nbsp;",p:p3},
+  {f:330,d:1,t:"Hee",p:p3},
+  {f:294,d:3,t:"na",p:p3},
+  
+  {f:466,d:.5,t:"Hap",p:p4},
+  {f:466,d:.5,t:"py&nbsp;",p:p4},
+  {f:440,d:1,t:"Birth",p:p4},
+  {f:349,d:1,t:"day&nbsp;",p:p4},
+  {f:392,d:1,t:"To&nbsp;",p:p4},
+  {f:349,d:2,t:"You",p:p4},
+];
 
-function randomizeImage() {
-  let root = document.documentElement;
-  root.style.setProperty('--image', 'url(' + images[currentIndex] + ')');
-  currentIndex++;
-  if (currentIndex >= images.length) {
-    currentIndex = 0;
+//DOM
+notes.map((n) => createSpan(n));
+
+function createSpan(n){
+  n.sp = document.createElement("span");
+  n.sp.innerHTML = n.t;
+  n.p.appendChild(n.sp);
+}
+
+// SOUND
+let speed = inputSpeed.value;
+let flag = false;
+let sounds = [];
+
+class Sound{
+  constructor(freq,dur,i){
+    this.stop = true;
+    this.frequency = freq;// la frecuencia
+    this.waveform = "triangle";// la forma de onda
+    this.dur = dur;// la duración en segundos
+    this.speed = this.dur*speed;
+    this.initialGain = .15;
+    this.index = i;
+    this.sp = notes[i].sp
   }
-  var puzzleItems = document.querySelectorAll('#puzz i');
-  for (var i = 0; i < puzzleItems.length; i++) {
-    puzzleItems[i].style.left = Math.random() * (window.innerWidth - 100) + 'px';
-    puzzleItems[i].style.top = Math.random() * (window.innerHeight - 100) + 'px';
+  
+  cease(){
+    this.stop = true;
+    this.sp.classList.remove("jump");
+    //this.sp.style.animationDuration = `${this.speed}s`;
+    if(this.index < sounds.length-1){sounds[this.index+1].play();}
+    if(this.index == sounds.length-1){flag = false;}
   }
+  
+  play(){
+   // crea un nuevo oscillator
+   this.oscillator = audioCtx.createOscillator();
+   // crea un nuevo nodo de ganancia 
+   this.gain = audioCtx.createGain();
+   // establece el valor inicial del volumen del sonido 
+   this.gain.gain.value = this.initialGain;
+   // establece el tipo de oscillator  
+   this.oscillator.type = this.waveform;
+   // y el valor de la frecuencia 
+   this.oscillator.frequency.value = this.frequency;
+   // el volumen del sonido baja exponencialmente     
+   this.gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + this.speed);
+   // conecta el oscillator con el nodo de ganancia 
+   this.oscillator.connect(this.gain);
+   // y la ganancia con el dispositivo de destino
+   this.gain.connect(audioCtx.destination);
+   // inicia el oscillator 
+   this.oscillator.start(audioCtx.currentTime);
+   this.sp.setAttribute("class", "jump");
+   this.stop = false;
+   // para el oscillator después de un tiempo (this.speed) 
+   this.oscillator.stop(audioCtx.currentTime + this.speed); 
+   this.oscillator.onended = ()=> {this.cease();}
+  }  
 }
 
-randomizeImage();
-
-function reloadPuzzle() {
-  var doneItems = document.querySelectorAll('.done');
-  doneItems.forEach(function (element) {
-    element.classList.toggle('done');
-  });
-  var droppedItems = document.querySelectorAll('.dropped');
-  droppedItems.forEach(function (element) {
-    element.classList.toggle('dropped');
-  });
-  var allDoneElement = document.querySelector('.allDone');
-  allDoneElement.style = '';
-  allDoneElement.classList.toggle('allDone');
+for(let i=0; i < notes.length; i++){
+  let sound = new Sound(notes[i].f, notes[i].d,i);
+  sounds.push(sound);
 }
 
-// mobile functionality
-var puzzleItemsMobile = document.querySelectorAll('#puzz i');
-puzzleItemsMobile.forEach(function (element) {
-  element.addEventListener('mousedown', function () {
-    totalClicks++;
-    document.querySelector('#clicks').innerHTML = totalClicks;
+
+// EVENTS
+wishes.addEventListener("click",function(e){
+  if(e.target.id != "inputSpeed" && !flag){
+  sounds[0].play();
+  flag = true;}
+  },false);
+                        
+                        
+inputSpeed.addEventListener("input",function(e){
+  speed = this.value;
+  sounds.map((s) => {
+    s.speed = s.dur*speed
   });
-  element.addEventListener('click', function () {
-    if (document.querySelector('.clicked')) {
-      document.querySelector('.clicked').classList.toggle('clicked');
-      element.classList.toggle('clicked');
-    } else {
-      element.classList.toggle('clicked');
-    }
-  });
-});
+},false);
 
-var puzzleItemsDesktop = document.querySelectorAll('#puz i');
-puzzleItemsDesktop.forEach(function (element) {
-  element.addEventListener('click', function () {
-    if (document.querySelector('.clicked')) {
-      var clickedElement = document.querySelector('.clicked');
-      if (clickedElement.classList.contains(element.classList)) {
-        element.classList.add('dropped');
-        clickedElement.classList.add('done');
-        clickedElement.classList.toggle('clicked');
+// CANVAS
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+let cw = canvas.width = window.innerWidth,
+  cx = cw / 2;
+let ch = canvas.height = window.innerHeight,
+  cy = ch / 2;
 
-        if (document.querySelectorAll('.dropped').length == 9) {
-          document.querySelector('#puz').classList.add('allDone');
-          document.querySelector('#puz').style.border = 'none';
-          document.querySelector('#puz').style.animation = 'allDone 1s linear forwards';
+let requestId = null;
 
-          setTimeout(function () {
-            reloadPuzzle();
-            randomizeImage();
-          }, 1500);
-        }
-      }
-    }
-  });
-});
+const colors = ["#93DFB8","#FFC8BA","#E3AAD6","#B5D8EB","#FFBDD8"];
 
-// desktop drag and drop
-function allowDrop(ev) {
-  ev.preventDefault();
-}
-
-function drag(ev) {
-  ev.dataTransfer.setData("text", ev.target.className);
-}
-
-function drop(ev) {
-  ev.preventDefault();
-  var data = ev.dataTransfer.getData("text");
-
-  if (ev.target.className == data) {
-    ev.target.classList.add('dropped');
-    document.querySelector('.' + data + "[draggable='true']").classList.add('done');
-
-    if (document.querySelectorAll('.dropped').length == 9) {
-      document.querySelector('#puz').classList.add('allDone');
-      document.querySelector('#puz').style.border = 'none';
-      document.querySelector('#puz').style.animation = 'allDone 1s linear forwards';
-
-      setTimeout(function () {
-        reloadPuzzle();
-        randomizeImage();
-      }, 1500);
-    }
+class Particle{
+  constructor(){
+    this.x = Math.random() * cw;
+    this.y = Math.random() * ch;
+    this.r = 15 + ~~(Math.random() * 20);//radius of the circumcircle
+    this.l = 3 + ~~(Math.random() * 2);//polygon sides
+    this.a = 2*Math.PI/this.l;// angle between polygon vertices
+    this.rot = Math.random()*Math.PI;// polygon rotation
+    this.speed = .05 + Math.random()/2;
+    this.rotSpeed = 0.005 + Math.random()*.005;
+    this.color = colors[~~(Math.random() * colors.length)];
   }
+  update(){
+    if(this.y < -this.r){
+      this.y = ch + this.r;
+      this.x = Math.random() * cw;
+    }
+    this.y -= this.speed;
+  }
+  draw(){
+    ctx.save();
+    ctx.translate(this.x,this.y);
+    ctx.rotate(this.rot);
+    ctx.beginPath();
+    for( let i = 0; i < this.l; i++ ){
+		let x = this.r * Math.cos( this.a*i );
+		let y = this.r * Math.sin( this.a*i );
+		ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = this.color;
+    ctx.stroke();
+    
+    ctx.restore();
+  }
+  
 }
+
+let particles = [];
+for(let i = 0; i < 20; i++){
+let p = new Particle();
+particles.push(p)
+}
+
+
+
+function Draw() {
+requestId = window.requestAnimationFrame(Draw);
+//ctx.globalAlpha=0.65;
+ctx.clearRect(0,0,cw,ch);
+particles.map((p) => {
+  p.rot += p.rotSpeed;
+  p.update();
+  p.draw();
+})
+
+}
+
+
+function Init() {
+	if (requestId) {
+		window.cancelAnimationFrame(requestId);
+		requestId = null;
+}
+
+
+cw = canvas.width = window.innerWidth,cx = cw / 2;
+ch = canvas.height = window.innerHeight,cy = ch / 2;
+
+//particles.map((p) => p.update());
+Draw();
+};
+
+setTimeout(function() {
+		Init();
+		window.addEventListener('resize', Init, false);
+}, 15);
+
+
